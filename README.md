@@ -1,4 +1,4 @@
-## Influencers and campaigns API
+# Influencers and campaigns API
 
 Thsi is a backend application for influencers who want to submit their works to brands participating in various campaigns designed by those brands
 
