@@ -11,6 +11,7 @@ import {
 import { CampaignService } from './campaign.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { JwtService } from '@nestjs/jwt';
+import { ApiOperation } from '@nestjs/swagger';
 
 @Controller('campaigns')
 export class CampaignController {
@@ -20,16 +21,19 @@ export class CampaignController {
   ) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a campaign' })
   async createCampaign(@Body() createCampaignDto: CreateCampaignDto) {
     return await this.campaignService.createCampaign(createCampaignDto);
   }
 
   @Get()
+  @ApiOperation({ summary: 'Fetch all campaigns' })
   async getAllCampaigns() {
     return await this.campaignService.getAllCampaigns();
   }
 
   @Get('joined')
+  @ApiOperation({ summary: 'Fetch campaigns an influencer has joined' })
   async getJoinedCampaigns(@Headers('authorization') authHeader: string) {
     const token = authHeader.replace('Bearer ', '');
     const decoded = this.jwtService.decode(token) as { influencerId: string };
@@ -37,6 +41,7 @@ export class CampaignController {
   }
 
   @Post(':id/join')
+  @ApiOperation({ summary: 'Influencer join a campaign' })
   async joinCampaign(
     @Param('id') campaignId: string,
     @Headers('authorization') authHeader: string,
@@ -54,6 +59,7 @@ export class CampaignController {
   }
 
   @Post(':id/post')
+  @ApiOperation({ summary: 'Influencer submit a post' })
   async submitPost(
     @Param('id') campaignId: string,
     @Body('link') postLink: string,
@@ -69,6 +75,7 @@ export class CampaignController {
   }
 
   @Get('owned')
+  @ApiOperation({ summary: 'Manager gets his/her own campaigns' })
   async getOwnCampaigns(@Headers('authorization') authHeader: string) {
     const token = authHeader.replace('Bearer ', '');
     const decoded = this.jwtService.decode(token) as { brandOwnerId: string };
@@ -76,6 +83,7 @@ export class CampaignController {
   }
 
   @Put(':id/review')
+  @ApiOperation({ summary: 'Manager approves and rejects a post' })
   async reviewPost(
     @Param('id') campaignId: string,
     @Query('influencerId') influencerId: string,
