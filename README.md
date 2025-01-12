@@ -5,7 +5,7 @@ This is a Nest.js backend application for influencers who want to submit their w
 ## Installation
 Unless the user wants to test the application locally, otherwise the application is hosted on a render platform with a link to the documentation below
 
-[Influencers-campaigns-Live-link](https://influencers-campaigns-bn.onrender.com/)
+[Influencers campaigns Live link](https://influencers-campaigns-bn.onrender.com/)
 
 
 ### Thanks
