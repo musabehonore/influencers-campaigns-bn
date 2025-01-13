@@ -75,7 +75,10 @@ export class UserService {
       });
       return {
         success: true,
-        data: token,
+        data: {
+          token,
+          role: user.role,
+        },
         message: 'Login successful!',
       };
     } catch (error) {
