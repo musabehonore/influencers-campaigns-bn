@@ -1,9 +1,9 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { UserService } from './user.service';
-
 // import { CreateUserDto, LoginUserDto } from './dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { LoginUserDto } from './dto/login-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @ApiTags('Users')
 @Controller('user')
@@ -15,10 +15,8 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'User registered successfully.' })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiBody({})
-  async signup(
-    @Body() body: { name: string; email: string; password: string },
-  ) {
-    return this.usersService.signup(body);
+  async signup(@Body() CreateUserDto: CreateUserDto) {
+    return this.usersService.signup(CreateUserDto);
   }
 
   @Post('login')
