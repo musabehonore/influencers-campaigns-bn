@@ -3,6 +3,8 @@ import {
   Controller,
   Get,
   Headers,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -35,6 +37,12 @@ export class CampaignController {
   @Get('joined')
   @ApiOperation({ summary: 'Fetch campaigns an influencer has joined' })
   async getJoinedCampaigns(@Headers('authorization') authHeader: string) {
+    if (!authHeader) {
+      throw new HttpException(
+        'Authorization is missing',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const token = authHeader.replace('Bearer ', '');
     const decoded = this.jwtService.decode(token) as { influencerId: string };
     return await this.campaignService.getJoinedCampaigns(decoded.influencerId);
@@ -46,6 +54,12 @@ export class CampaignController {
     @Param('id') campaignId: string,
     @Headers('authorization') authHeader: string,
   ) {
+    if (!authHeader) {
+      throw new HttpException(
+        'Authorization is missing',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const token = authHeader.replace('Bearer ', '');
     const decoded = this.jwtService.decode(token) as {
       influencerId: string;
@@ -65,6 +79,12 @@ export class CampaignController {
     @Body('link') postLink: string,
     @Headers('authorization') authHeader: string,
   ) {
+    if (!authHeader) {
+      throw new HttpException(
+        'Authorization is missing',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const token = authHeader.replace('Bearer ', '');
     const decoded = this.jwtService.decode(token) as { influencerId: string };
     return await this.campaignService.submitPost(
@@ -77,9 +97,16 @@ export class CampaignController {
   @Get('owned')
   @ApiOperation({ summary: 'Manager gets his/her own campaigns' })
   async getOwnCampaigns(@Headers('authorization') authHeader: string) {
+    if (!authHeader) {
+      throw new HttpException(
+        'Authorization is missing',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const token = authHeader.replace('Bearer ', '');
-    const decoded = this.jwtService.decode(token) as { brandOwnerId: string };
-    return await this.campaignService.getOwnCampaigns(decoded.brandOwnerId);
+    const decoded = this.jwtService.decode(token) as { name: string };
+    // console.log('Decoded here2: ', decoded);
+    return await this.campaignService.getOwnCampaigns(decoded.name);
   }
 
   @Put(':id/review')

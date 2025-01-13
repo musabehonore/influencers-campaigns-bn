@@ -31,7 +31,7 @@ export class CampaignService {
     }
   }
 
-  // Get all campaigns (accessible by influencers)
+  // Get all campaigns (accessible by influencers and others)
   async getAllCampaigns(): Promise<{
     success: boolean;
     data?: Campaign[];
@@ -161,11 +161,15 @@ export class CampaignService {
 
   // Get campaigns owned by a brand manager
   async getOwnCampaigns(
-    brandOwnerId: string,
+    name: string,
   ): Promise<{ success: boolean; data?: Campaign[]; message: string }> {
     try {
+      console.log(name);
+      if (typeof name !== 'string') {
+        throw new Error('Invalid brand owner name');
+      }
       const campaigns = await this.campaignModel
-        .find({ brandOwner: brandOwnerId })
+        .find({ brandOwner: name })
         .exec();
 
       return {
