@@ -52,6 +52,30 @@ export class CampaignService {
       };
     }
   }
+
+  // Get joined campaigns
+  async getJoinedCampaigns(
+    influencerId: string,
+  ): Promise<{ success: boolean; data?: Campaign[]; message: string }> {
+    try {
+      const campaigns = await this.campaignModel
+        .find({ 'influencers.influencerId': influencerId })
+        .exec();
+
+      return {
+        success: true,
+        data: campaigns,
+        message: 'Joined campaigns fetched successfully.',
+      };
+    } catch (error) {
+      console.error('Error fetching joined campaigns:', error.message);
+      return {
+        success: false,
+        message: error.message || 'An unknown error occurred.',
+      };
+    }
+  }
+
   // Get single campaign view
   async getSingleCampaign(campaignId): Promise<{
     success: boolean;
@@ -75,27 +99,6 @@ export class CampaignService {
   }
 
   // Get campaigns joined by an influencer
-  async getJoinedCampaigns(
-    influencerId: string,
-  ): Promise<{ success: boolean; data?: Campaign[]; message: string }> {
-    try {
-      const campaigns = await this.campaignModel
-        .find({ 'influencers.influencerId': influencerId })
-        .exec();
-
-      return {
-        success: true,
-        data: campaigns,
-        message: 'Joined campaigns fetched successfully.',
-      };
-    } catch (error) {
-      console.error('Error fetching joined campaigns:', error.message);
-      return {
-        success: false,
-        message: error.message || 'An unknown error occurred.',
-      };
-    }
-  }
 
   // Join a campaign (for influencers)
   async joinCampaign(

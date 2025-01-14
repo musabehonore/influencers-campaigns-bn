@@ -11,9 +11,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { CampaignService } from './campaign.service';
-import { CreateCampaignDto } from './dto/create-campaign.dto';
+// import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { JwtService } from '@nestjs/jwt';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { CreateCampaignDto } from './dto/create-campaign.dto';
 
 @Controller('campaigns')
 export class CampaignController {
@@ -34,12 +35,6 @@ export class CampaignController {
     return await this.campaignService.getAllCampaigns();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Fetch single campaign' })
-  async getSingleCampain(@Param('id') campaignId: string) {
-    return await this.campaignService.getSingleCampaign(campaignId);
-  }
-
   @Get('joined')
   @ApiOperation({ summary: 'Fetch campaigns an influencer has joined' })
   async getJoinedCampaigns(@Headers('authorization') authHeader: string) {
@@ -52,6 +47,12 @@ export class CampaignController {
     const token = authHeader.replace('Bearer ', '');
     const decoded = this.jwtService.decode(token) as { influencerId: string };
     return await this.campaignService.getJoinedCampaigns(decoded.influencerId);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Fetch single campaign' })
+  async getSingleCampain(@Param('id') campaignId: string) {
+    return await this.campaignService.getSingleCampaign(campaignId);
   }
 
   @Post(':id/join')
@@ -80,6 +81,7 @@ export class CampaignController {
 
   @Post(':id/post')
   @ApiOperation({ summary: 'Influencer submit a post' })
+  @ApiBody({})
   async submitPost(
     @Param('id') campaignId: string,
     @Body('link') postLink: string,
