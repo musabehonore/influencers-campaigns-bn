@@ -13,7 +13,7 @@ import {
 import { CampaignService } from './campaign.service';
 // import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { JwtService } from '@nestjs/jwt';
-import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 
 @Controller('campaigns')
@@ -37,6 +37,7 @@ export class CampaignController {
 
   @Get('joined')
   @ApiOperation({ summary: 'Fetch campaigns an influencer has joined' })
+  @ApiBearerAuth()
   async getJoinedCampaigns(@Headers('authorization') authHeader: string) {
     if (!authHeader) {
       throw new HttpException(
@@ -59,14 +60,9 @@ export class CampaignController {
     return await this.campaignService.getJoinedCampaigns(decoded.influencerId);
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Fetch single campaign' })
-  async getSingleCampain(@Param('id') campaignId: string) {
-    return await this.campaignService.getSingleCampaign(campaignId);
-  }
-
   @Post(':id/join')
   @ApiOperation({ summary: 'Influencer join a campaign' })
+  @ApiBearerAuth()
   async joinCampaign(
     @Param('id') campaignId: string,
     @Headers('authorization') authHeader: string,
@@ -92,6 +88,7 @@ export class CampaignController {
   @Post(':id/post')
   @ApiOperation({ summary: 'Influencer submit a post' })
   @ApiBody({})
+  @ApiBearerAuth()
   async submitPost(
     @Param('id') campaignId: string,
     @Body('link') postLink: string,
@@ -114,6 +111,7 @@ export class CampaignController {
 
   @Get('owned')
   @ApiOperation({ summary: 'Manager gets his/her own campaigns' })
+  @ApiBearerAuth()
   async getOwnCampaigns(@Headers('authorization') authHeader: string) {
     if (!authHeader) {
       throw new HttpException(
@@ -129,17 +127,39 @@ export class CampaignController {
 
   @Put(':id/review')
   @ApiOperation({ summary: 'Manager approves and rejects a post' })
+  @ApiBearerAuth()
   async reviewPost(
-    @Param('id') campaignId: string,
-    @Query('influencerId') influencerId: string,
+    @Headers('authorization') authHeader: string,
+    @Param('campaignId') campaignId: string,
+    @Query('name') name: string,
     @Query('postId') postId: string,
     @Query('status') status: 'accepted' | 'rejected',
   ) {
+    if (!authHeader) {
+      throw new HttpException(
+        'Authorization is missing',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const decoded = this.jwtService.decode(token) as { role: string };
+    if (decoded.role !== 'manager') {
+      throw new HttpException(
+        'Unauthorized, the service is for managers only',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     return await this.campaignService.reviewPost(
       campaignId,
-      influencerId,
+      name,
       postId,
       status,
     );
+  }
+  @Get(':id')
+  @ApiOperation({ summary: 'Fetch single campaign' })
+  async getSingleCampain(@Param('id') campaignId: string) {
+    return await this.campaignService.getSingleCampaign(campaignId);
   }
 }

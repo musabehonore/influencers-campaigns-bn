@@ -213,7 +213,7 @@ export class CampaignService {
   // Accept or reject a post submitted by an influencer
   async reviewPost(
     campaignId: string,
-    influencerId: string,
+    name: string,
     postId: string,
     status: 'accepted' | 'rejected',
   ): Promise<{ success: boolean; message: string }> {
@@ -224,9 +224,7 @@ export class CampaignService {
         return { success: false, message: 'Campaign not found.' };
       }
 
-      const influencer = campaign.influencers.find(
-        (inf) => inf.influencerId === influencerId,
-      );
+      const influencer = campaign.influencers.find((inf) => inf.name === name);
 
       if (!influencer) {
         return {
