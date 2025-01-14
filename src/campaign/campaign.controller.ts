@@ -45,7 +45,17 @@ export class CampaignController {
       );
     }
     const token = authHeader.replace('Bearer ', '');
-    const decoded = this.jwtService.decode(token) as { influencerId: string };
+    const decoded = this.jwtService.decode(token) as {
+      influencerId: string;
+      role: string;
+    };
+    const role = decoded.role;
+    if (role !== 'influencer') {
+      throw new HttpException(
+        'Only influencers can see their campaigns joined',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     return await this.campaignService.getJoinedCampaigns(decoded.influencerId);
   }
 
