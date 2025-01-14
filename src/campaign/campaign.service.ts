@@ -52,6 +52,27 @@ export class CampaignService {
       };
     }
   }
+  // Get single campaign view
+  async getSingleCampaign(campaignId): Promise<{
+    success: boolean;
+    data?: Campaign;
+    message: string;
+  }> {
+    try {
+      const campaign = await this.campaignModel.findById(campaignId);
+      return {
+        success: true,
+        data: campaign,
+        message: 'Campaign fetched successfully!',
+      };
+    } catch (error) {
+      console.error('Error fetching campaigns:', error.message);
+      return {
+        success: false,
+        message: error.message || 'An unknown error occurred.',
+      };
+    }
+  }
 
   // Get campaigns joined by an influencer
   async getJoinedCampaigns(

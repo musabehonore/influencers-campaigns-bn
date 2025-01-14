@@ -34,6 +34,12 @@ export class CampaignController {
     return await this.campaignService.getAllCampaigns();
   }
 
+  @Get(':id')
+  @ApiOperation({ summary: 'Fetch single campaign' })
+  async getSingleCampain(@Param('id') campaignId: string) {
+    return await this.campaignService.getSingleCampaign(campaignId);
+  }
+
   @Get('joined')
   @ApiOperation({ summary: 'Fetch campaigns an influencer has joined' })
   async getJoinedCampaigns(@Headers('authorization') authHeader: string) {
