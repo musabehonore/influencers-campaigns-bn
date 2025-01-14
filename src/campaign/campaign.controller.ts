@@ -7,8 +7,6 @@ import {
   HttpStatus,
   Param,
   Post,
-  Put,
-  Query,
 } from '@nestjs/common';
 import { CampaignService } from './campaign.service';
 // import { CreateCampaignDto } from './dto/create-campaign.dto';
@@ -125,41 +123,66 @@ export class CampaignController {
     return await this.campaignService.getOwnCampaigns(decoded.name);
   }
 
-  @Put(':id/review')
-  @ApiOperation({ summary: 'Manager approves and rejects a post' })
+  // Review the post status
+  @Post('update-post-status')
+  @ApiOperation({ summary: 'Review post status' })
   @ApiBearerAuth()
-  async reviewPost(
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        postId: { type: 'string', description: 'ID of the post to update' },
+        status: {
+          type: 'string',
+          enum: ['accepted', 'rejected'],
+          description: 'New status for the post',
+        },
+      },
+      required: ['postId', 'status'],
+    },
+  })
+  async updatePostStatus(
     @Headers('authorization') authHeader: string,
-    @Param('campaignId') campaignId: string,
-    @Query('name') name: string,
-    @Query('postId') postId: string,
-    @Query('status') status: 'accepted' | 'rejected',
+    @Body('postId') postId: string,
+    @Body('status') status: 'accepted' | 'rejected',
   ) {
-    if (!authHeader) {
+    if (!postId || !status) {
       throw new HttpException(
-        'Authorization is missing',
-        HttpStatus.UNAUTHORIZED,
+        'Post ID and status are required',
+        HttpStatus.BAD_REQUEST,
       );
     }
-
-    const token = authHeader.replace('Bearer ', '');
-    const decoded = this.jwtService.decode(token) as { role: string };
-    if (decoded.role !== 'manager') {
-      throw new HttpException(
-        'Unauthorized, the service is for managers only',
-        HttpStatus.UNAUTHORIZED,
-      );
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const decoded = this.jwtService.decode(token) as { role: string };
+      if (decoded.role !== 'manager') {
+        throw new HttpException(
+          'Unauthorized, Only brand manager can view the campaign',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
     }
-    return await this.campaignService.reviewPost(
-      campaignId,
-      name,
-      postId,
-      status,
-    );
+    return await this.campaignService.updatePostStatus(postId, status);
   }
+
   @Get(':id')
   @ApiOperation({ summary: 'Fetch single campaign' })
-  async getSingleCampain(@Param('id') campaignId: string) {
+  @ApiBearerAuth()
+  async getSingleCampain(
+    @Headers('authorization') authHeader: string,
+    @Param('id') campaignId: string,
+  ) {
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const decoded = this.jwtService.decode(token) as { role: string };
+      if (decoded.role === 'manager') {
+        throw new HttpException(
+          'Unauthorized, Only brand manager can view the campaign',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+    }
+
     return await this.campaignService.getSingleCampaign(campaignId);
   }
 }

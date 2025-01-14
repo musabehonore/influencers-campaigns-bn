@@ -210,42 +210,35 @@ export class CampaignService {
     }
   }
 
-  // Accept or reject a post submitted by an influencer
-  async reviewPost(
-    campaignId: string,
-    name: string,
+  // Review a post's status
+  async updatePostStatus(
     postId: string,
     status: 'accepted' | 'rejected',
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const campaign = await this.campaignModel.findById(campaignId);
+      const campaigns = await this.campaignModel.find().exec();
 
-      if (!campaign) {
-        return { success: false, message: 'Campaign not found.' };
+      for (const campaign of campaigns) {
+        for (const influencer of campaign.influencers) {
+          const post = influencer.posts.find(
+            (p) => p._id.toString() === postId,
+          );
+          if (post) {
+            post.status = status;
+
+            await campaign.save();
+
+            return {
+              success: true,
+              message: `Post status updated to '${status}' successfully.`,
+            };
+          }
+        }
       }
 
-      const influencer = campaign.influencers.find((inf) => inf.name === name);
-
-      if (!influencer) {
-        return {
-          success: false,
-          message: 'Influencer not found in this campaign.',
-        };
-      }
-
-      const post = influencer.posts.find((p) => p._id.toString() === postId);
-
-      if (!post) {
-        return { success: false, message: 'Post not found.' };
-      }
-
-      post.status = status;
-
-      await campaign.save();
-
-      return { success: true, message: `Post ${status} successfully.` };
+      return { success: false, message: 'Post not found.' };
     } catch (error) {
-      console.error('Error reviewing post:', error.message);
+      console.error('Error updating post status:', error.message);
       return {
         success: false,
         message: error.message || 'An unknown error occurred.',
