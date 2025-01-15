@@ -11,7 +11,7 @@ Unless the user who wants to test the application locally, otherwise the applica
 ### Local server
 For localhost experience:
 
-+ Git clone the repository[influencers-campaigns-bn](https://github.com/musabehonore/influencers-campaigns-bn.git)
++ Git clone the repository   [influencers-campaigns-bn](https://github.com/musabehonore/influencers-campaigns-bn.git)
 + cd cloned-repo-location
 + npm run install
 + npm run start
