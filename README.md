@@ -19,6 +19,4 @@ For localhost experience:
 
 Or use postman or other applications on port [postman link](http://localhost:4000)
 
-
-
-### Thanks
+## Regards
