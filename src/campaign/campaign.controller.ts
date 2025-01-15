@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  Patch,
   Post,
 } from '@nestjs/common';
 import { CampaignService } from './campaign.service';
@@ -124,7 +125,7 @@ export class CampaignController {
   }
 
   // Review the post status
-  @Post('update-post-status')
+  @Patch('update-post-status')
   @ApiOperation({ summary: 'Review post status' })
   @ApiBearerAuth()
   @ApiBody({
